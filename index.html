@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pondok Pesantren Modern Tahfidz Yasfi Subang | PSB Online & Profil Resmi</title>
+    <link rel="icon" href="images/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1B4D3E',
+                        secondary: '#2E7D32',
+                        accent: '#D4AF37',
+                        dark: '#0f2920',
+                        light: '#F4F7F5'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Amiri', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .arabic-text { font-family: 'Amiri', serif; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+        .gallery-item img { transition: transform .5s ease; }
+        .gallery-item:hover img { transform: scale(1.06); }
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-light text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Global Notification Modal -->
+    <div id="alert-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl border-t-4 border-accent text-center">
+            <div id="alert-icon" class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary text-2xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 id="alert-title" class="text-xl font-bold text-primary mb-2">Informasi</h3>
+            <p id="alert-message" class="text-slate-600 mb-6 text-sm">Pesan sistem...</p>
+            <button onclick="closeModal()" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2.5 rounded-xl transition shadow-md">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Lightbox Foto -->
+    <div id="lightbox" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop p-4" onclick="closeLightbox()">
+        <button class="absolute top-4 right-4 text-white text-2xl" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+        <figure class="max-w-4xl w-full" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="" class="w-full max-h-[80vh] object-contain rounded-2xl">
+            <figcaption id="lightbox-caption" class="text-center text-white text-sm mt-3"></figcaption>
+        </figure>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('beranda')">
+                    <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-md border-2 border-accent overflow-hidden"
+                         data-photo="logo" data-cls="w-full h-full object-contain" data-icon="fa-mosque text-2xl text-primary" data-alt="Logo Pondok Yasfi Subang"></div>
+                    <div>
+                        <span class="block text-xs font-bold tracking-wider text-accent uppercase">Pondok Pesantren Modern</span>
+                        <h1 class="text-lg font-extrabold text-primary leading-tight">YASFI SUBANG</h1>
+                    </div>
+                </div>
+
+                <nav class="hidden lg:flex items-center space-x-1 xl:space-x-2">
+                    <button onclick="switchView('beranda')" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-primary hover:bg-slate-50 transition">Beranda</button>
+                    <button onclick="switchView('profil')" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-primary hover:bg-slate-50 transition">Profil</button>
+                    <button onclick="switchView('sistem-pendidikan')" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-primary hover:bg-slate-50 transition">Sistem Pendidikan</button>
+                    <div class="relative group">
+                        <button class="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-primary hover:bg-slate-50 transition flex items-center space-x-1">
+                            <span>Program</span>
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="absolute left-0 pt-1 w-56 hidden group-hover:block z-50">
+                            <div class="bg-white rounded-xl shadow-xl border border-slate-100 py-2">
+                                <button onclick="switchProgram('modern')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-primary/5 hover:text-primary">Program Modern (KMI)</button>
+                                <button onclick="switchProgram('tahfidz')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-primary/5 hover:text-primary">Program Tahfidz Al-Qur'an</button>
+                                <button onclick="switchProgram('kitab')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-primary/5 hover:text-primary">Program Pendidikan Kitab</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="switchView('pendaftaran')" class="px-4 py-2 rounded-xl text-sm font-bold bg-accent text-slate-900 hover:bg-amber-400 transition shadow-sm">Daftar PSB</button>
+                    <button onclick="switchView('cek-status')" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-primary hover:bg-slate-50 transition">Cek Bukti</button>
+                    <button onclick="openAdminLogin()" class="px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-primary hover:text-white transition">Admin</button>
+                </nav>
+
+                <div class="flex items-center lg:hidden space-x-2">
+                    <button onclick="switchView('pendaftaran')" class="bg-accent text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">Daftar</button>
+                    <button onclick="toggleMobileMenu()" class="p-2 rounded-lg text-slate-700 hover:bg-slate-100 focus:outline-none" aria-label="Menu">
+                        <i id="mobile-menu-icon" class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-100 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchView('beranda'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">Beranda</button>
+            <button onclick="switchView('profil'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">Profil Pondok</button>
+            <button onclick="switchView('sistem-pendidikan'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">Sistem Pendidikan</button>
+            <button onclick="switchProgram('modern'); toggleMobileMenu();" class="block w-full text-left pl-6 py-1.5 text-xs font-medium text-slate-600 hover:text-primary">• Program Modern (KMI)</button>
+            <button onclick="switchProgram('tahfidz'); toggleMobileMenu();" class="block w-full text-left pl-6 py-1.5 text-xs font-medium text-slate-600 hover:text-primary">• Program Tahfidz</button>
+            <button onclick="switchProgram('kitab'); toggleMobileMenu();" class="block w-full text-left pl-6 py-1.5 text-xs font-medium text-slate-600 hover:text-primary">• Program Kitab</button>
+            <button onclick="switchView('pendaftaran'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-primary bg-primary/10">Pendaftaran PSB Online</button>
+            <button onclick="switchView('cek-status'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">Cek Bukti Pendaftaran</button>
+            <button onclick="openAdminLogin(); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100">Login Admin Dashboard</button>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- VIEW: BERANDA -->
+        <section id="view-beranda" class="view-section">
+            <div class="relative bg-gradient-to-br from-primary via-dark to-slate-900 text-white py-20 lg:py-28 overflow-hidden">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center lg:text-left flex flex-col lg:flex-row items-center justify-between gap-10">
+                    <div class="lg:w-7/12">
+                        <span class="inline-flex items-center space-x-2 bg-accent/20 text-accent text-xs font-bold px-3 py-1.5 rounded-full mb-6 border border-accent/30">
+                            <i class="fa-solid fa-star text-[10px]"></i>
+                            <span id="site-badge">PENERIMAAN SANTRI BARU</span>
+                        </span>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+                            Membentuk Generasi Qur'ani, Berakhlak & <span class="text-accent">Berwawasan Global</span>
+                        </h1>
+                        <p class="text-lg text-slate-300 mb-8 max-w-2xl">
+                            Selamat datang di portal resmi Pondok Pesantren Modern Tahfidz Yasfi Subang. Pusat pendidikan Islam terpadu yang memadukan sistem KMI, Tahfidz Al-Qur'an, dan Kitab Kuning.
+                        </p>
+                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-4">
+                            <button onclick="switchView('pendaftaran')" class="w-full sm:w-auto bg-accent hover:bg-amber-400 text-slate-900 font-extrabold px-8 py-4 rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 text-center flex items-center justify-center space-x-2">
+                                <span>Daftar Santri Baru</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <button onclick="switchView('profil')" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-2xl backdrop-blur-sm transition border border-white/20 text-center">
+                                Jelajahi Profil
+                            </button>
+                        </div>
+                    </div>
+                    <div class="lg:w-4/12 w-full max-w-md">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/20 shadow-2xl text-center">
+                            <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-primary/60 flex items-center justify-center mb-4"
+                                 data-photo="hero" data-cls="w-full h-full object-cover" data-icon="fa-mosque text-6xl text-accent" data-alt="Pondok Pesantren Yasfi Subang"></div>
+                            <div class="px-2 pb-2">
+                                <h3 class="text-xl font-bold mb-2">Pendaftaran Dibuka</h3>
+                                <p class="text-slate-300 text-sm mb-4">Amankan kursi putra-putri Anda melalui sistem PSB online yang cepat dan transparan.</p>
+                                <div class="space-y-2 text-left bg-black/20 p-4 rounded-xl text-xs text-slate-200">
+                                    <div class="flex justify-between"><span>Gelombang:</span> <span id="site-wave" class="font-bold text-accent"></span></div>
+                                    <div class="flex justify-between"><span>Status:</span> <span class="font-bold text-emerald-400">ONLINE</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <h2 class="text-xs font-bold tracking-widest text-secondary uppercase mb-2">Tentang Kami</h2>
+                        <h3 class="text-3xl font-extrabold text-primary mb-4">Pondok Pesantren Modern Tahfidz Yasfi Subang</h3>
+                        <div class="w-20 h-1 bg-accent mx-auto rounded-full mb-6"></div>
+                        <p class="text-slate-600 text-base leading-relaxed">
+                            Berdiri dengan komitmen tinggi dalam mencetak kader ulama dan pemimpin umat yang cerdas, mandiri, serta berakhlakul karimah di Kabupaten Subang, Jawa Barat.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-light p-8 rounded-2xl border border-slate-100 hover:shadow-lg transition">
+                            <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center text-xl mb-6"><i class="fa-solid fa-book-quran"></i></div>
+                            <h4 class="text-xl font-bold text-primary mb-3">Tahfidz Unggulan</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">Program pembinaan hafalan Al-Qur'an intensif dengan metode murajaah terstruktur dan sanad bacaan yang jelas.</p>
+                        </div>
+                        <div class="bg-light p-8 rounded-2xl border border-slate-100 hover:shadow-lg transition">
+                            <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center text-xl mb-6"><i class="fa-solid fa-school"></i></div>
+                            <h4 class="text-xl font-bold text-primary mb-3">Sistem KMI Modern</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">Pendidikan formal dan pesantren berasrama mengikuti model Kulliyyatul Mu'allimin Al-Islamiyyah (KMI) Gontor.</p>
+                        </div>
+                        <div class="bg-light p-8 rounded-2xl border border-slate-100 hover:shadow-lg transition">
+                            <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center text-xl mb-6"><i class="fa-solid fa-scroll"></i></div>
+                            <h4 class="text-xl font-bold text-primary mb-3">Kajian Kitab Kuning</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">Pendalaman ilmu-ilmu keislaman klasik (turats) bersanad untuk membekali santri pemahaman agama yang mendalam.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Galeri Beranda -->
+            <div class="py-16 bg-slate-50 border-t border-slate-200/60">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-3xl mx-auto mb-12">
+                        <h2 class="text-xs font-bold tracking-widest text-secondary uppercase mb-2">Galeri</h2>
+                        <h3 class="text-3xl font-extrabold text-primary mb-4">Suasana Kehidupan di Pondok</h3>
+                        <div class="w-20 h-1 bg-accent mx-auto rounded-full"></div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 gallery-container"></div>
+                </div>
+            </div>
+
+            <div class="py-16 bg-white border-t border-slate-200/60">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <h2 class="text-xs font-bold tracking-widest text-secondary uppercase mb-2">Pilihan Program</h2>
+                        <h3 class="text-3xl font-extrabold text-primary mb-4">Tiga Program Pendidikan Utama</h3>
+                        <div class="w-20 h-1 bg-accent mx-auto rounded-full mb-6"></div>
+                        <p class="text-slate-600">Pilih jalur pendidikan yang sesuai dengan bakat, minat, dan cita-cita buah hati Anda.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" id="home-program-cards"></div>
+                </div>
+            </div>
+
+            <div class="py-16 bg-slate-50 border-t border-slate-200/60">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-12">
+                    <div class="lg:w-1/2">
+                        <span class="text-xs font-bold tracking-widest text-secondary uppercase mb-2 block">Metodologi & Sistem</span>
+                        <h2 class="text-3xl font-extrabold text-primary mb-6">Sistem Pembelajaran Terpadu 24 Jam</h2>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Di Pondok Pesantren Modern Tahfidz Yasfi Subang, proses pendidikan tidak berhenti di ruang kelas. Seluruh aktivitas santri di asrama, masjid, dan lapangan diatur dalam ekosistem pendidikan yang membentuk kedisiplinan dan kemandirian.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold flex-shrink-0 mt-1">1</div>
+                                <div>
+                                    <h4 class="font-bold text-primary">Kurikulum Kemenag & Pesantren</h4>
+                                    <p class="text-sm text-slate-600">Memadukan ijazah formal nasional dengan kurikulum kepesantrenan unggulan.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold flex-shrink-0 mt-1">2</div>
+                                <div>
+                                    <h4 class="font-bold text-primary">Bilingual Environment (Arab & Inggris)</h4>
+                                    <p class="text-sm text-slate-600">Pembiasaan percakapan bahasa resmi dalam kehidupan sehari-hari asrama.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold flex-shrink-0 mt-1">3</div>
+                                <div>
+                                    <h4 class="font-bold text-primary">Ekstrakurikuler & Pengembangan Bakat</h4>
+                                    <p class="text-sm text-slate-600">Drum band, pramuka, pidato 3 bahasa, olahraga, dan seni baca Al-Qur'an.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <button onclick="switchView('sistem-pendidikan')" class="bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-xl shadow transition text-sm">
+                                Pelajari Sistem Pendidikan Lengkap &rarr;
+                            </button>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 w-full">
+                        <div class="bg-gradient-to-tr from-primary to-secondary p-2 rounded-3xl shadow-2xl">
+                            <div class="bg-white p-8 rounded-2xl text-slate-800">
+                                <h3 class="text-xl font-bold text-primary mb-4 flex items-center space-x-2">
+                                    <i class="fa-solid fa-clock text-accent"></i>
+                                    <span>Jadwal Singkat Harian Santri</span>
+                                </h3>
+                                <ul class="space-y-3 text-sm divide-y divide-slate-100">
+                                    <li class="pt-2 flex justify-between gap-4"><span class="font-medium text-slate-700">04:00 - 05:30</span> <span class="text-slate-500 text-right">Qiyamul Lail & Shalat Subuh Berjamaah</span></li>
+                                    <li class="pt-2 flex justify-between gap-4"><span class="font-medium text-slate-700">05:30 - 07:00</span> <span class="text-slate-500 text-right">Setoran Hafalan & Mufrodat</span></li>
+                                    <li class="pt-2 flex justify-between gap-4"><span class="font-medium text-slate-700">07:30 - 12:30</span> <span class="text-slate-500 text-right">Kegiatan Belajar Mengajar Formal</span></li>
+                                    <li class="pt-2 flex justify-between gap-4"><span class="font-medium text-slate-700">13:30 - 15:00</span> <span class="text-slate-500 text-right">Istirahat & Shalat Dzuhur</span></li>
+                                    <li class="pt-2 flex justify-between gap-4"><span class="font-medium text-slate-700">15:30 - 17:30</span> <span class="text-slate-500 text-right">Kajian Kitab / Ekstrakurikuler</span></li>
+                                    <li class="pt-2 flex justify-between gap-4"><span class="font-medium text-slate-700">19:30 - 21:30</span> <span class="text-slate-500 text-right">Bimbingan Belajar Malam & Istirahat</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-16 bg-white border-t border-slate-200/60">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <h2 class="text-xs font-bold tracking-widest text-secondary uppercase mb-2">Alur Mudah</h2>
+                        <h3 class="text-3xl font-extrabold text-primary mb-4">Langkah Pendaftaran PSB Online</h3>
+                        <div class="w-20 h-1 bg-accent mx-auto rounded-full mb-6"></div>
+                        <p class="text-slate-600">Proses pendaftaran santri baru kini dapat dilakukan secara online dari mana saja.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-light p-6 rounded-2xl border border-slate-100 text-center">
+                            <div class="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center font-bold mx-auto mb-4 text-lg">1</div>
+                            <h4 class="font-bold text-primary mb-2">Isi Formulir</h4>
+                            <p class="text-xs text-slate-600">Mengisi data calon santri dan memilih program unggulan di website.</p>
+                        </div>
+                        <div class="bg-light p-6 rounded-2xl border border-slate-100 text-center">
+                            <div class="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center font-bold mx-auto mb-4 text-lg">2</div>
+                            <h4 class="font-bold text-primary mb-2">Simpan Bukti & QR</h4>
+                            <p class="text-xs text-slate-600">Mendapatkan Nomor Pendaftaran unik dan QR Code verifikasi instan.</p>
+                        </div>
+                        <div class="bg-light p-6 rounded-2xl border border-slate-100 text-center">
+                            <div class="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center font-bold mx-auto mb-4 text-lg">3</div>
+                            <h4 class="font-bold text-primary mb-2">Verifikasi Berkas</h4>
+                            <p class="text-xs text-slate-600">Panitia memverifikasi data dan calon santri mengikuti seleksi.</p>
+                        </div>
+                        <div class="bg-light p-6 rounded-2xl border border-slate-100 text-center">
+                            <div class="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center font-bold mx-auto mb-4 text-lg">4</div>
+                            <h4 class="font-bold text-primary mb-2">Pengumuman & Daftar Ulang</h4>
+                            <p class="text-xs text-slate-600">Hasil seleksi diumumkan dan santri melakukan daftar ulang.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: PROFIL PONDOK -->
+        <section id="view-profil" class="view-section hidden py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold tracking-widest text-secondary uppercase mb-2">Profil Resmi</h2>
+                    <h3 class="text-3xl font-extrabold text-primary mb-4">Pondok Pesantren Modern Tahfidz Yasfi Subang</h3>
+                    <div class="w-20 h-1 bg-accent mx-auto rounded-full mb-6"></div>
+                    <p class="text-slate-600">Mengenal lebih dekat sejarah, visi misi, kepemimpinan, dan fasilitas pondok.</p>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100 mb-12 flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/3 text-center">
+                        <div class="w-48 h-48 rounded-2xl bg-primary/10 border-4 border-accent flex items-center justify-center mx-auto mb-4 overflow-hidden shadow-inner"
+                             data-photo="pimpinan" data-cls="w-full h-full object-cover" data-icon="fa-user-tie text-6xl text-primary" data-alt="Pimpinan Pondok"></div>
+                        <h4 class="font-bold text-primary text-lg" id="site-leader">KH. Pimpinan Pondok</h4>
+                        <p class="text-xs text-slate-500">Pimpinan Pesantren Yasfi Subang</p>
+                    </div>
+                    <div class="w-full md:w-2/3">
+                        <span class="text-xs font-bold text-accent uppercase tracking-wider block mb-2">Sambutan Pimpinan</span>
+                        <h3 class="text-2xl font-bold text-primary mb-4">"Mencetak Generasi Unggul Berlandaskan Al-Qur'an dan Sunnah"</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                            Puji syukur kami panjatkan ke hadirat Allah SWT. Pondok Pesantren Modern Tahfidz Yasfi Subang hadir sebagai jawaban atas kebutuhan umat akan pendidikan Islam yang memadukan kedalaman ilmu agama (tafaqquh fiddin) dengan penguasaan sains dan teknologi.
+                        </p>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Kami mengundang bapak/ibu wali santri untuk mempercayakan pendidikan putra-putrinya di lembaga kami, bersama membina generasi masa depan yang saleh, cerdas, dan bermanfaat bagi masyarakat.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-bold text-primary mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-landmark text-accent"></i><span>Sejarah Singkat</span>
+                        </h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Pondok Pesantren Modern Tahfidz Yasfi Subang didirikan atas dasar semangat untuk menyediakan lembaga pendidikan Islam berkualitas di Kabupaten Subang. Dengan mengadopsi sistem kepesantrenan modern, pondok terus berkembang pesat dalam membimbing santri dari berbagai daerah di Jawa Barat maupun luar provinsi.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <h3 class="text-xl font-bold text-primary mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-bullseye text-accent"></i><span>Visi & Misi</span>
+                        </h3>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-slate-800 text-sm mb-1">Visi:</h4>
+                            <p class="text-slate-600 text-xs italic">"Menjadi lembaga pendidikan Islam unggulan yang melahirkan generasi penghafal Al-Qur'an, berakhlak mulia, menguasai ilmu pengetahuan dan teknologi."</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm mb-1">Misi:</h4>
+                            <ul class="text-xs text-slate-600 space-y-1.5 list-disc pl-4">
+                                <li>Menyelenggarakan pendidikan tahfidz Al-Qur'an yang sistematis dan berkualitas.</li>
+                                <li>Menerapkan sistem pembelajaran KMI dan kitab kuning secara konsisten.</li>
+                                <li>Membina kepribadian santri dengan akhlakul karimah dan kedisiplinan tinggi.</li>
+                                <li>Mengembangkan potensi akademik dan keterampilan santri.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-12">
+                    <h3 class="text-xl font-bold text-primary mb-6 flex items-center space-x-2">
+                        <i class="fa-solid fa-building-columns text-accent"></i><span>Fasilitas & Lingkungan Pondok</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-light rounded-2xl text-center">
+                            <i class="fa-solid fa-mosque text-3xl text-primary mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800">Masjid Jami'</h4>
+                            <p class="text-xs text-slate-500">Pusat ibadah & pembinaan spiritual</p>
+                        </div>
+                        <div class="p-4 bg-light rounded-2xl text-center">
+                            <i class="fa-solid fa-bed text-3xl text-primary mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800">Asrama Santri</h4>
+                            <p class="text-xs text-slate-500">Nyaman, aman, & terkontrol 24 jam</p>
+                        </div>
+                        <div class="p-4 bg-light rounded-2xl text-center">
+                            <i class="fa-solid fa-book text-3xl text-primary mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800">Ruang Kelas & Perpustakaan</h4>
+                            <p class="text-xs text-slate-500">Representatif untuk belajar</p>
+                        </div>
+                        <div class="p-4 bg-light rounded-2xl text-center">
+                            <i class="fa-solid fa-utensils text-3xl text-primary mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800">Aula & Dapur Sehat</h4>
+                            <p class="text-xs text-slate-500">Menyediakan gizi seimbang santri</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold text-primary mb-6 flex items-center space-x-2">
+                        <i class="fa-solid fa-images text-accent"></i><span>Galeri Foto Pondok</span>
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 gallery-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: SISTEM PENDIDIKAN -->
+        <section id="view-sistem-pendidikan" class="view-section hidden py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-bold tracking-widest text-secondary uppercase mb-2">Kurikulum Terpadu</h2>
+                    <h3 class="text-3xl font-extrabold text-primary mb-4">Sistem Pendidikan & Pembelajaran</h3>
+                    <div class="w-20 h-1 bg-accent mx-auto rounded-full mb-6"></div>
+                    <p class="text-slate-600">Penjelasan lengkap mengenai pilihan program, metode pembelajaran, dan kegiatan harian di pesantren.</p>
+                </div>
+                <div class="space-y-12" id="sistem-pendidikan-content"></div>
+            </div>
+        </section>
+
+        <!-- VIEW: PROGRAM DETAIL -->
+        <section id="view-program-detail" class="view-section hidden py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <button onclick="switchView('beranda')" class="text-xs font-bold text-primary flex items-center space-x-1 hover:underline">
+                        <i class="fa-solid fa-arrow-left"></i><span>Kembali ke Beranda</span>
+                    </button>
+                </div>
+                <div id="program-detail-container" class="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100"></div>
+            </div>
+        </section>
+
+        <!-- VIEW: PENDAFTARAN PSB ONLINE -->
+        <section id="view-pendaftaran" class="view-section hidden py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-xs font-bold tracking-widest text-secondary uppercase mb-2 block">Penerimaan Santri Baru</span>
+                    <h2 class="text-3xl font-extrabold text-primary mb-4">Formulir Pendaftaran Online</h2>
+                    <div class="w-20 h-1 bg-accent mx-auto rounded-full mb-4"></div>
+                    <p class="text-slate-600 text-sm">Lengkapi formulir di bawah ini dengan data yang benar dan valid.</p>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-100">
+                    <form id="psb-form" onsubmit="submitPSB(event)" class="space-y-6">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Pilihan Program Pendidikan (Opsional)</label>
+                            <select id="reg-program" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm bg-slate-50 font-medium">
+                                <option value="">-- Tanpa Program Spesifik / Umum --</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Nama Lengkap Calon Santri <span class="text-red-500">*</span></label>
+                                <input type="text" id="reg-name" required placeholder="Sesuai Akta Kelahiran" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">NIK / Nomor Induk Kependudukan <span class="text-red-500">*</span></label>
+                                <input type="text" id="reg-nik" required inputmode="numeric" pattern="[0-9]{16}" maxlength="16" title="NIK harus 16 digit angka" placeholder="16 digit NIK" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Jenis Kelamin <span class="text-red-500">*</span></label>
+                                <select id="reg-gender" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                                    <option value="Laki-laki">Laki-laki (Putra)</option>
+                                    <option value="Perempuan">Perempuan (Putri)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Tempat Lahir <span class="text-red-500">*</span></label>
+                                <input type="text" id="reg-pob" required placeholder="Kota Kelahiran" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Tanggal Lahir <span class="text-red-500">*</span></label>
+                                <input type="date" id="reg-dob" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Asal Sekolah (SD/MI/SMP/MTs) <span class="text-red-500">*</span></label>
+                                <input type="text" id="reg-school" required placeholder="Nama Asal Sekolah" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Jenjang Masuk <span class="text-red-500">*</span></label>
+                                <select id="reg-level" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                                    <option value="SMP / MTs">Tingkat SMP / MTs</option>
+                                    <option value="SMA / MA">Tingkat SMA / MA</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Nama Orang Tua / Wali <span class="text-red-500">*</span></label>
+                                <input type="text" id="reg-parent" required placeholder="Nama Ayah / Ibu / Wali" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Nomor WhatsApp Aktif (Wali) <span class="text-red-500">*</span></label>
+                                <input type="tel" id="reg-phone" required inputmode="tel" pattern="[0-9+]{9,15}" title="Hanya angka, 9-15 digit" placeholder="08xxxxxxxxxx" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Alamat Lengkap Domisili <span class="text-red-500">*</span></label>
+                            <textarea id="reg-address" required rows="3" placeholder="Jalan, RT/RW, Desa/Kelurahan, Kecamatan, Kabupaten/Kota" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm"></textarea>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" id="psb-submit-btn" class="w-full bg-accent hover:bg-amber-400 disabled:opacity-60 text-slate-900 font-extrabold py-4 rounded-xl shadow-lg transition text-base flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Kirim Pendaftaran & Dapatkan Bukti</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CEK BUKTI PENDAFTARAN -->
+        <section id="view-cek-status" class="view-section hidden py-16">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-extrabold text-primary mb-2">Cek Bukti Pendaftaran</h2>
+                    <p class="text-slate-600 text-sm">Masukkan Nomor Pendaftaran dan NIK calon santri untuk melihat dan mencetak kembali bukti pendaftaran.</p>
+                </div>
+
+                <form onsubmit="searchRegistration(event)" class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-8 grid grid-cols-1 sm:grid-cols-5 gap-3">
+                    <input type="text" id="search-reg-input" required placeholder="No. Pendaftaran (YASFI-2026-XXXXX)" class="sm:col-span-2 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                    <input type="text" id="search-nik-input" required inputmode="numeric" maxlength="16" placeholder="NIK (16 digit)" class="sm:col-span-2 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:outline-none text-sm">
+                    <button type="submit" class="bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-xl text-sm transition">Cari</button>
+                </form>
+
+                <div id="search-result-container"></div>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN LOGIN -->
+        <section id="view-admin-login" class="view-section hidden py-20">
+            <div class="max-w-md mx-auto px-4">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-primary text-accent rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary">Admin Dashboard Login</h3>
+                        <p class="text-slate-500 text-xs mt-1">Pondok Pesantren Modern Tahfidz Yasfi Subang</p>
+                    </div>
+
+                    <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email</label>
+                            <input type="email" id="admin-user" required autocomplete="username" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-primary focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                            <input type="password" id="admin-pass" required autocomplete="current-password" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-primary focus:outline-none">
+                        </div>
+                        <div class="pt-2">
+                            <button type="submit" id="admin-login-btn" class="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-bold py-3 rounded-xl shadow transition text-sm">Masuk Dashboard</button>
+                        </div>
+                    </form>
+                    <div class="mt-6 text-center">
+                        <button onclick="switchView('beranda')" class="text-xs text-slate-500 hover:text-primary">&larr; Kembali ke Beranda</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: ADMIN DASHBOARD -->
+        <section id="view-admin-dashboard" class="view-section hidden py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-primary text-accent flex items-center justify-center font-bold text-xl">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-primary">Dashboard Admin PSB</h2>
+                            <p class="text-xs text-slate-500">Pondok Pesantren Modern Tahfidz Yasfi Subang</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap justify-center gap-3">
+                        <div class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="admin-email-badge">Admin</span>
+                        </div>
+                        <button onclick="reloadRegistrants()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-semibold transition">
+                            <i class="fa-solid fa-rotate mr-1"></i> Muat Ulang
+                        </button>
+                        <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-700 px-4 py-2 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex space-x-2 border-b border-slate-200 mb-8 overflow-x-auto pb-1">
+                    <button onclick="switchAdminTab('registrants')" id="admin-tab-btn-registrants" class="admin-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-primary text-white transition whitespace-nowrap">Data Pendaftar PSB</button>
+                    <button onclick="switchAdminTab('programs')" id="admin-tab-btn-programs" class="admin-tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm text-slate-600 hover:bg-slate-100 transition whitespace-nowrap">Kelola Program</button>
+                </div>
+
+                <div id="admin-tab-registrants" class="admin-tab-content space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center space-x-3 w-full md:w-auto">
+                            <input type="text" id="admin-search-input" onkeyup="updateRegistrantsTable()" placeholder="Cari nama / nomor pendaftaran..." class="px-4 py-2 rounded-xl border border-slate-200 text-sm w-full md:w-80 focus:ring-2 focus:ring-primary focus:outline-none">
+                            <select id="admin-filter-program" onchange="updateRegistrantsTable()" class="px-4 py-2 rounded-xl border border-slate-200 text-sm bg-slate-50 font-medium">
+                                <option value="">Semua Program</option>
+                            </select>
+                        </div>
+                        <div class="text-xs text-slate-500 font-medium">
+                            Total Pendaftar: <span id="total-registrants-count" class="font-bold text-primary">0</span> santri
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-600 uppercase">
+                                        <th class="p-4">No. Pendaftaran</th>
+                                        <th class="p-4">Nama Santri</th>
+                                        <th class="p-4">Program</th>
+                                        <th class="p-4">Asal Sekolah</th>
+                                        <th class="p-4">Wali / WhatsApp</th>
+                                        <th class="p-4">Status</th>
+                                        <th class="p-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="registrants-table-body" class="divide-y divide-slate-100 text-sm text-slate-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="admin-tab-programs" class="admin-tab-content hidden space-y-6">
+                    <div class="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                        <div>
+                            <h3 class="text-lg font-bold text-primary">Manajemen Program Pendidikan</h3>
+                            <p class="text-xs text-slate-500">Tambah, edit, atau perbarui kurikulum dan persyaratan program.</p>
+                        </div>
+                        <button onclick="openProgramModal(null)" class="bg-primary hover:bg-primary/90 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow">
+                            <i class="fa-solid fa-plus mr-1"></i> Tambah Program Baru
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="admin-programs-grid"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-slate-300 pt-16 pb-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden"
+                             data-photo="logo" data-cls="w-full h-full object-contain" data-icon="fa-mosque text-xl text-primary" data-alt="Logo Pondok Yasfi Subang"></div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-accent uppercase">Pondok Pesantren Modern</span>
+                            <h4 class="text-white font-extrabold text-base">YASFI SUBANG</h4>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Pusat pendidikan Islam terpadu yang membina generasi rabbani, berakhlak mulia, dan berwawasan global di Kabupaten Subang.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4 border-l-2 border-accent pl-3">Menu Utama</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><button onclick="switchView('beranda')" class="hover:text-accent transition">Beranda</button></li>
+                        <li><button onclick="switchView('profil')" class="hover:text-accent transition">Profil Pondok</button></li>
+                        <li><button onclick="switchView('sistem-pendidikan')" class="hover:text-accent transition">Sistem Pendidikan</button></li>
+                        <li><button onclick="switchView('pendaftaran')" class="hover:text-accent transition">Pendaftaran PSB Online</button></li>
+                        <li><button onclick="switchView('cek-status')" class="hover:text-accent transition">Cek Bukti Pendaftaran</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4 border-l-2 border-accent pl-3">Program Unggulan</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><button onclick="switchProgram('modern')" class="hover:text-accent transition">Program Modern (KMI)</button></li>
+                        <li><button onclick="switchProgram('tahfidz')" class="hover:text-accent transition">Program Tahfidz Al-Qur'an</button></li>
+                        <li><button onclick="switchProgram('kitab')" class="hover:text-accent transition">Program Pendidikan Kitab</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4 border-l-2 border-accent pl-3">Kontak & Lokasi</h4>
+                    <ul class="space-y-2 text-xs text-slate-400">
+                        <li><i class="fa-solid fa-location-dot text-accent mr-2"></i> <span id="site-address"></span></li>
+                        <li><i class="fa-solid fa-phone text-accent mr-2"></i> <span id="site-phone"></span></li>
+                        <li><i class="fa-solid fa-envelope text-accent mr-2"></i> <span id="site-email"></span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
+                &copy; 2026 Pondok Pesantren Modern Tahfidz Yasfi Subang. Hak Cipta Dilindungi.
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL: Program CRUD Form -->
+    <div id="program-modal" class="fixed inset-0 z-50 flex items-start justify-center modal-backdrop hidden overflow-y-auto py-10">
+        <div class="bg-white rounded-3xl p-8 max-w-xl w-full mx-4 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="program-modal-title" class="text-xl font-bold text-primary">Tambah / Edit Program</h3>
+                <button onclick="closeProgramModal()" class="text-slate-400 hover:text-slate-600 text-lg" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="program-form" onsubmit="saveProgramData(event)" class="space-y-4">
+                <input type="hidden" id="prog-id">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Nama Program <span class="text-red-500">*</span></label>
+                    <input type="text" id="prog-name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Slug (unik) <span class="text-red-500">*</span></label>
+                    <input type="text" id="prog-slug" required placeholder="modern / tahfidz / kitab" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Deskripsi Singkat <span class="text-red-500">*</span></label>
+                    <textarea id="prog-short" required rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Deskripsi Lengkap</label>
+                    <textarea id="prog-full" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Kurikulum / Materi</label>
+                    <textarea id="prog-curriculum" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Metode Pembelajaran</label>
+                    <textarea id="prog-method" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Persyaratan Masuk</label>
+                    <textarea id="prog-requirements" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Jadwal</label>
+                    <textarea id="prog-schedule" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Urutan</label>
+                        <input type="number" id="prog-order" value="1" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Status Tampil</label>
+                        <select id="prog-active" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                            <option value="true">Aktif</option>
+                            <option value="false">Nonaktif</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-4 flex space-x-3">
+                    <button type="button" onclick="closeProgramModal()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-sm transition">Batal</button>
+                    <button type="submit" class="w-1/2 bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl text-sm transition shadow">Simpan Program</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* =====================================================
+           KONFIGURASI - ubah bagian ini saja untuk mengganti isi
+           ===================================================== */
+        const SUPABASE_URL = "https://utodnkyoolzlpbmouzag.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_17xxUPf7dJkE8gFUS7HyLA_JwjBo5jl";
+
+        // Info situs (periksa dan sesuaikan dengan data resmi pondok)
+        const SITE = {
+            badge: 'PENERIMAAN SANTRI BARU TAHUN AJARAN 2026/2027',
+            wave: 'Gelombang 1: 1 Jan - 30 Apr 2026',
+            leader: 'KH. Pimpinan Pondok',
+            address: 'Subang, Jawa Barat, Indonesia',
+            phone: '+62 812-3456-7890',
+            email: 'info@yasfisubang.ponpes.id'
+        };
+
+        // Foto & logo: simpan file di folder "images" sejajar dengan index.html
+        const PHOTOS = {
+            logo: 'images/logo.png',
+            hero: 'images/hero.jpg',
+            pimpinan: 'images/pimpinan.jpg',
+            gallery: [
+                { src: 'images/masjid.jpg',   caption: "Masjid Jami'" },
+                { src: 'images/asrama.jpg',   caption: 'Asrama Santri' },
+                { src: 'images/kelas.jpg',    caption: 'Ruang Kelas' },
+                { src: 'images/tahfidz.jpg',  caption: 'Halaqah Tahfidz' },
+                { src: 'images/olahraga.jpg', caption: 'Olahraga & Ekstrakurikuler' },
+                { src: 'images/kegiatan.jpg', caption: 'Kegiatan Santri' }
+            ]
+        };
+
+        /* ===================================================== */
+
+        const defaultPrograms = [
+            {
+                id: 'default-1', name: 'Program Pendidikan Modern (KMI)', slug: 'modern',
+                short_description: 'Program pendidikan modern yang memadukan pelajaran sekolah pagi dengan sistem KMI model Gontor.',
+                full_description: "Memadukan kurikulum nasional Kemenag dengan sistem Kulliyyatul Mu'allimin Al-Islamiyyah (KMI). Santri mendapatkan pelajaran sekolah umum di pagi hari dan kepesantrenan di sore/malam hari.",
+                curriculum_description: 'Kurikulum KMI Gontor, Bahasa Arab & Inggris, Mata Pelajaran Nasional SMP/SMA.',
+                learning_method: 'Sistem asrama 24 jam, sorogan, bandongan, dan muhadharah.',
+                requirements: 'Lulus SD/MI atau SMP/MTs, sehat jasmani rohani, lulus tes tertulis dan lisan.',
+                schedule_description: 'Pagi: Sekolah Formal. Sore: Diniyah & KMI. Malam: Bimbingan Belajar.',
+                is_active: true, sort_order: 1
+            },
+            {
+                id: 'default-2', name: "Program Tahfidz Al-Qur'an", slug: 'tahfidz',
+                short_description: "Program pendidikan yang berfokus pada hafalan Al-Qur'an, murajaah, dan pembinaan bacaan.",
+                full_description: "Program intensif menghafal Al-Qur'an 30 Juz dengan bimbingan musyrif/musyrifah berpengalaman.",
+                curriculum_description: "Target hafalan terukur per semester, Tahsinul Qiro'ah, Ilmu Tajwid, dan Terjemah Al-Qur'an.",
+                learning_method: "Talaqqi, Setoran Mandiri, Tasmi', dan Murojaah berjamaah.",
+                requirements: "Niat kuat menghafal Al-Qur'an, lulus tes baca tulis Al-Qur'an dan wawancara.",
+                schedule_description: "Fokus setoran ba'da Subuh dan ba'da Ashar setiap hari.",
+                is_active: true, sort_order: 2
+            },
+            {
+                id: 'default-3', name: 'Program Pendidikan Kitab', slug: 'kitab',
+                short_description: 'Program pembelajaran kitab-kitab Islam klasik (turats) dengan bimbingan pengajar berpengalaman.',
+                full_description: "Mengkaji kitab-kitab para ulama mu'tabarah dalam bidang Fiqih, Nahwu, Shorof, Akhlak, dan Tauhid.",
+                curriculum_description: "Kitab Jurumiyah, Fathul Qarib, Riyadhus Shalihin, Ta'lim Muta'allim, dll.",
+                learning_method: 'Sorogan, Bandongan, Diskusi Ilmiah (Bahtsul Masail).',
+                requirements: 'Memahami dasar membaca kitab Arab gundul atau lulus seleksi penempatan kelas.',
+                schedule_description: "Kajian rutin ba'da Maghrib dan ba'da Subuh.",
+                is_active: true, sort_order: 3
+            }
+        ];
+
+        let currentPrograms = [];
+        let programsFromDb = false;
+        let registrantsList = [];
+        let supabaseClient = null;
+
+        /* ---------- Util ---------- */
+        function esc(v) {
+            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function waLink(phone) {
+            let d = String(phone || '').replace(/\D/g, '');
+            if (d.startsWith('0')) d = '62' + d.slice(1);
+            return 'https://wa.me/' + d;
+        }
+        function activePrograms() {
+            return currentPrograms.filter(p => p.is_active !== false);
+        }
+
+        /* ---------- Foto & Galeri ---------- */
+        function imgFallback(img, iconClass) {
+            const i = document.createElement('i');
+            i.className = 'fa-solid ' + iconClass;
+            img.replaceWith(i);
+        }
+        function photoHTML(src, cls, iconClass, alt) {
+            return `<img src="${esc(src)}" alt="${esc(alt)}" class="${esc(cls)}" loading="lazy" onerror="imgFallback(this, '${iconClass.replace(/'/g, '')}')">`;
+        }
+        function setupPhotos() {
+            document.querySelectorAll('[data-photo]').forEach(el => {
+                const src = PHOTOS[el.dataset.photo];
+                if (src) el.innerHTML = photoHTML(src, el.dataset.cls, el.dataset.icon, el.dataset.alt || '');
+            });
+            document.querySelectorAll('.gallery-container').forEach(box => {
+                box.innerHTML = PHOTOS.gallery.map((g, i) => `
+                    <button type="button" onclick="openLightbox(${i})" class="gallery-item group relative aspect-[4/3] rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center text-primary/40 text-4xl focus:outline-none focus:ring-2 focus:ring-accent">
+                        ${photoHTML(g.src, 'w-full h-full object-cover', 'fa-image', g.caption)}
+                        <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs font-semibold text-left px-3 pt-8 pb-2">${esc(g.caption)}</span>
+                    </button>
+                `).join('');
+            });
+        }
+        function openLightbox(i) {
+            const g = PHOTOS.gallery[i];
+            document.getElementById('lightbox-img').src = g.src;
+            document.getElementById('lightbox-img').alt = g.caption;
+            document.getElementById('lightbox-caption').innerText = g.caption;
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden');
+            lb.classList.add('flex');
+        }
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('hidden');
+            lb.classList.remove('flex');
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+        function applySiteInfo() {
+            document.getElementById('site-badge').innerText = SITE.badge;
+            document.getElementById('site-wave').innerText = SITE.wave;
+            document.getElementById('site-leader').innerText = SITE.leader;
+            document.getElementById('site-address').innerText = SITE.address;
+            document.getElementById('site-phone').innerText = SITE.phone;
+            document.getElementById('site-email').innerText = SITE.email;
+        }
+
+        /* ---------- Init ---------- */
+        window.onload = async function () {
+            applySiteInfo();
+            setupPhotos();
+            initSupabase();
+            await loadPrograms();
+            renderHomePrograms();
+            renderSistemPendidikan();
+            populateProgramDropdown();
+        };
+
+        function initSupabase() {
+            try {
+                if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                }
+            } catch (e) {
+                console.error('Supabase init error:', e);
+                supabaseClient = null;
+            }
+        }
+
+        /* ---------- Navigasi & UI ---------- */
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            menu.classList.toggle('hidden');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-xmark');
+        }
+
+        function showAlert(title, message, isSuccess = true) {
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            const icon = document.getElementById('alert-icon');
+            if (isSuccess) {
+                icon.className = 'w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-2xl';
+                icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else {
+                icon.className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600 text-2xl';
+                icon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+            }
+            document.getElementById('alert-modal').classList.remove('hidden');
+        }
+        function closeModal() { document.getElementById('alert-modal').classList.add('hidden'); }
+
+        /* ---------- Program ---------- */
+        async function loadPrograms() {
+            programsFromDb = false;
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('programs').select('*').order('sort_order', { ascending: true });
+                    if (!error && data && data.length > 0) {
+                        currentPrograms = data;
+                        programsFromDb = true;
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Gagal memuat program dari Supabase, memakai data bawaan.', e);
+                }
+            }
+            currentPrograms = defaultPrograms.map(p => ({ ...p }));
+        }
+
+        function renderHomePrograms() {
+            const container = document.getElementById('home-program-cards');
+            if (!container) return;
+            container.innerHTML = activePrograms().map(p => `
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-xl transition transform hover:-translate-y-1">
+                    <div>
+                        <div class="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl mb-6"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h4 class="text-xl font-bold text-primary mb-3">${esc(p.name)}</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">${esc(p.short_description)}</p>
+                    </div>
+                    <button onclick="switchProgram('${esc(p.slug)}')" class="w-full bg-primary/10 hover:bg-primary hover:text-white text-primary font-semibold py-3 rounded-xl text-sm transition text-center">
+                        Pelajari Program &rarr;
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderSistemPendidikan() {
+            const container = document.getElementById('sistem-pendidikan-content');
+            if (!container) return;
+            container.innerHTML = activePrograms().map((p, idx) => `
+                <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-100 flex flex-col md:flex-row gap-8 items-center">
+                    <div class="md:w-1/3 text-center bg-primary/5 p-8 rounded-2xl border border-primary/10 w-full">
+                        <div class="w-16 h-16 bg-primary text-accent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow"><i class="fa-solid fa-book-open"></i></div>
+                        <h4 class="font-extrabold text-primary text-lg mb-2">${esc(p.name)}</h4>
+                        <span class="text-xs font-bold px-3 py-1 bg-accent/20 text-slate-800 rounded-full inline-block">Program Unggulan #${idx + 1}</span>
+                    </div>
+                    <div class="md:w-2/3 space-y-4">
+                        <h3 class="text-2xl font-bold text-primary">${esc(p.name)}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">${esc(p.full_description || p.short_description)}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="bg-light p-4 rounded-xl">
+                                <h5 class="font-bold text-xs text-primary uppercase mb-1">Kurikulum / Materi</h5>
+                                <p class="text-xs text-slate-600">${esc(p.curriculum_description || 'Sesuai standar kurikulum pesantren modern.')}</p>
+                            </div>
+                            <div class="bg-light p-4 rounded-xl">
+                                <h5 class="font-bold text-xs text-primary uppercase mb-1">Metode Pembelajaran</h5>
+                                <p class="text-xs text-slate-600">${esc(p.learning_method || 'Tatap muka dan bimbingan asrama terpadu.')}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchProgram(slug) {
+            const prog = currentPrograms.find(p => p.slug === slug);
+            if (!prog) return;
+            switchView('program-detail');
+            document.getElementById('program-detail-container').innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-primary text-accent rounded-xl flex items-center justify-center text-2xl"><i class="fa-solid fa-star"></i></div>
+                        <div>
+                            <span class="text-xs font-bold text-secondary uppercase tracking-wider">Program Unggulan Pesantren</span>
+                            <h2 class="text-3xl font-extrabold text-primary">${esc(prog.name)}</h2>
+                        </div>
+                    </div>
+                    <hr class="border-slate-100">
+                    <div>
+                        <h4 class="font-bold text-primary text-base mb-2">Deskripsi & Keunggulan</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">${esc(prog.full_description || prog.short_description)}</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="bg-light p-6 rounded-2xl">
+                            <h4 class="font-bold text-primary text-sm mb-2"><i class="fa-solid fa-book mr-2 text-accent"></i>Kurikulum & Materi</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">${esc(prog.curriculum_description || '-')}</p>
+                        </div>
+                        <div class="bg-light p-6 rounded-2xl">
+                            <h4 class="font-bold text-primary text-sm mb-2"><i class="fa-solid fa-chalkboard-user mr-2 text-accent"></i>Metode & Jadwal</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">${esc(prog.learning_method || '-')}<br><br><strong>Jadwal:</strong> ${esc(prog.schedule_description || '-')}</p>
+                        </div>
+                    </div>
+                    <div class="bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                        <h4 class="font-bold text-primary text-sm mb-2">Persyaratan Masuk</h4>
+                        <p class="text-xs text-slate-700 leading-relaxed">${esc(prog.requirements || '-')}</p>
+                    </div>
+                    <div class="pt-4 text-center">
+                        <button onclick="switchView('pendaftaran')" class="bg-accent hover:bg-amber-400 text-slate-900 font-extrabold px-8 py-4 rounded-xl shadow-lg transition">Daftar PSB Sekarang</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateProgramDropdown() {
+            const select = document.getElementById('reg-program');
+            const adminFilter = document.getElementById('admin-filter-program');
+            if (!select) return;
+            let optionsHtml = '<option value="">-- Tanpa Program Spesifik / Umum --</option>';
+            activePrograms().forEach(p => { optionsHtml += `<option value="${esc(p.name)}">${esc(p.name)}</option>`; });
+            select.innerHTML = optionsHtml;
+
+            if (adminFilter) {
+                let filterHtml = '<option value="">Semua Program</option><option value="Umum / Reguler">Umum / Reguler</option>';
+                currentPrograms.forEach(p => { filterHtml += `<option value="${esc(p.name)}">${esc(p.name)}</option>`; });
+                adminFilter.innerHTML = filterHtml;
+            }
+        }
+
+        /* ---------- Pendaftaran ---------- */
+        async function submitPSB(e) {
+            e.preventDefault();
+            const btn = document.getElementById('psb-submit-btn');
+            if (!supabaseClient) {
+                showAlert('Koneksi Bermasalah', 'Sistem belum terhubung ke server. Muat ulang halaman lalu coba lagi.', false);
+                return;
+            }
+
+            const rand = Math.floor(10000 + Math.random() * 90000);
+            const record = {
+                id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('reg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)),
+                registration_number: 'YASFI-2026-' + rand,
+                program: document.getElementById('reg-program').value || 'Umum / Reguler',
+                name: document.getElementById('reg-name').value.trim(),
+                nik: document.getElementById('reg-nik').value.trim(),
+                gender: document.getElementById('reg-gender').value,
+                pob: document.getElementById('reg-pob').value.trim(),
+                dob: document.getElementById('reg-dob').value,
+                school: document.getElementById('reg-school').value.trim(),
+                level: document.getElementById('reg-level').value,
+                parent: document.getElementById('reg-parent').value.trim(),
+                phone: document.getElementById('reg-phone').value.trim(),
+                address: document.getElementById('reg-address').value.trim(),
+                status: 'Pending',
+                created_at: new Date().toISOString()
+            };
+
+            btn.disabled = true;
+            try {
+                // INSERT saja (tanpa .select()) agar tidak butuh izin SELECT untuk anon
+                const { error } = await supabaseClient.from('registrants').insert([record]);
+                if (error) {
+                    console.error('Supabase insert error:', error);
+                    showAlert('Pendaftaran Belum Tersimpan', 'Data belum berhasil dikirim ke server. Silakan coba lagi atau hubungi panitia. (' + error.message + ')', false);
+                    return;
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert('Koneksi Bermasalah', 'Pendaftaran belum berhasil disimpan. Periksa koneksi internet lalu coba lagi.', false);
+                return;
+            } finally {
+                btn.disabled = false;
+            }
+
+            document.getElementById('psb-form').reset();
+            showRegistrationProof(record);
+        }
+
+        function showRegistrationProof(record) {
+            switchView('cek-status');
+            const container = document.getElementById('search-result-container');
+            container.innerHTML = `
+                <div id="print-area" class="bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-200 space-y-6">
+                    <div class="flex justify-between items-start border-b border-slate-100 pb-6 gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                                ${photoHTML(PHOTOS.logo, 'w-full h-full object-contain', 'fa-mosque text-xl text-primary', 'Logo')}
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-primary text-base">PONDOK PESANTREN MODERN TAHFIDZ YASFI SUBANG</h4>
+                                <p class="text-xs text-slate-500">Bukti Resmi Pendaftaran Santri Baru (PSB) 2026/2027</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold">${esc(record.status)}</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                        <div class="md:col-span-2 space-y-3 text-sm">
+                            <div class="flex justify-between gap-4 border-b border-slate-50 pb-1"><span class="text-slate-500">Nomor Pendaftaran:</span> <span class="font-bold text-primary">${esc(record.registration_number)}</span></div>
+                            <div class="flex justify-between gap-4 border-b border-slate-50 pb-1"><span class="text-slate-500">Nama Lengkap:</span> <span class="font-bold text-slate-800 text-right">${esc(record.name)}</span></div>
+                            <div class="flex justify-between gap-4 border-b border-slate-50 pb-1"><span class="text-slate-500">Program / Jalur:</span> <span class="font-bold text-secondary text-right">${esc(record.program || 'Umum / Reguler')}</span></div>
+                            <div class="flex justify-between gap-4 border-b border-slate-50 pb-1"><span class="text-slate-500">Asal Sekolah:</span> <span class="font-medium text-slate-800 text-right">${esc(record.school)}</span></div>
+                            <div class="flex justify-between gap-4 border-b border-slate-50 pb-1"><span class="text-slate-500">Orang Tua / Wali:</span> <span class="font-medium text-slate-800 text-right">${esc(record.parent)} (${esc(record.phone)})</span></div>
+                        </div>
+                        <div class="text-center flex flex-col items-center justify-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div id="qrcode" class="mb-2"></div>
+                            <span class="text-[10px] font-bold text-slate-500">SCAN UNTUK VERIFIKASI</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-primary/5 p-4 rounded-2xl text-xs text-slate-600 leading-relaxed border border-primary/10">
+                        <strong>Catatan Penting:</strong> Simpan bukti pendaftaran ini (cetak atau screenshot) dan tunjukkan kepada panitia PSB saat verifikasi berkas. Untuk melihat bukti ini lagi, gunakan menu Cek Bukti dengan Nomor Pendaftaran dan NIK.
+                    </div>
+
+                    <div class="flex space-x-3 pt-2">
+                        <button onclick="window.print()" class="w-1/2 bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl text-sm transition shadow flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-print"></i><span>Cetak / Unduh PDF</span>
+                        </button>
+                        <button onclick="switchView('beranda')" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-sm transition">Selesai & Beranda</button>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const qrContainer = document.getElementById('qrcode');
+                if (qrContainer && window.QRCode) {
+                    qrContainer.innerHTML = '';
+                    new QRCode(qrContainer, {
+                        text: `YASFI-PSB-${record.registration_number}`,
+                        width: 110, height: 110,
+                        colorDark: '#1B4D3E', colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
+            }, 100);
+        }
+
+        // Cek bukti publik lewat fungsi RPC di Supabase (butuh nomor pendaftaran DAN NIK)
+        async function searchRegistration(e) {
+            e.preventDefault();
+            const reg = document.getElementById('search-reg-input').value.trim();
+            const nik = document.getElementById('search-nik-input').value.trim();
+            if (!reg || !nik) {
+                showAlert('Perhatian', 'Masukkan nomor pendaftaran dan NIK terlebih dahulu.', false);
+                return;
+            }
+            if (!supabaseClient) {
+                showAlert('Koneksi Bermasalah', 'Sistem belum terhubung ke server.', false);
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient.rpc('get_registration', { p_reg: reg, p_nik: nik });
+                if (error) {
+                    console.error(error);
+                    showAlert('Fitur Belum Aktif', 'Pencarian bukti belum bisa dipakai. Hubungi panitia PSB. (' + error.message + ')', false);
+                    return;
+                }
+                const found = Array.isArray(data) ? data[0] : data;
+                if (found) {
+                    showRegistrationProof(found);
+                } else {
+                    showAlert('Tidak Ditemukan', 'Data dengan nomor pendaftaran dan NIK tersebut tidak ditemukan. Periksa kembali isian Anda.', false);
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert('Koneksi Bermasalah', 'Gagal menghubungi server. Coba lagi nanti.', false);
+            }
+        }
+
+        /* ---------- Admin: Auth ---------- */
+        async function getSession() {
+            if (!supabaseClient) return null;
+            const { data } = await supabaseClient.auth.getSession();
+            return data ? data.session : null;
+        }
+
+        async function enterDashboard(session) {
+            document.getElementById('admin-email-badge').innerText = session.user.email;
+            switchView('admin-dashboard');
+            renderAdminPrograms();
+            populateProgramDropdown();
+            await loadRegistrants();
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            if (!supabaseClient) {
+                showAlert('Koneksi Bermasalah', 'Sistem belum terhubung ke server.', false);
+                return;
+            }
+            const btn = document.getElementById('admin-login-btn');
+            btn.disabled = true;
+            try {
+                const email = document.getElementById('admin-user').value.trim();
+                const password = document.getElementById('admin-pass').value;
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) {
+                    showAlert('Login Gagal', 'Email atau password salah.', false);
+                    return;
+                }
+                document.getElementById('admin-pass').value = '';
+                await enterDashboard(data.session);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function openAdminLogin() {
+            const session = await getSession();
+            if (session) {
+                await enterDashboard(session);
+            } else {
+                switchView('admin-login');
+            }
+        }
+
+        async function logoutAdmin() {
+            if (supabaseClient) await supabaseClient.auth.signOut();
+            registrantsList = [];
+            updateRegistrantsTable();
+            switchView('beranda');
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.className = 'admin-tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm text-slate-600 hover:bg-slate-100 transition whitespace-nowrap';
+            });
+            document.getElementById('admin-tab-' + tabName).classList.remove('hidden');
+            document.getElementById('admin-tab-btn-' + tabName).className = 'admin-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-primary text-white transition whitespace-nowrap';
+        }
+
+        /* ---------- Admin: Pendaftar ---------- */
+        async function loadRegistrants() {
+            const session = await getSession();
+            if (!session) { registrantsList = []; updateRegistrantsTable(); return; }
+
+            const { data, error } = await supabaseClient.from('registrants').select('*').order('created_at', { ascending: false });
+            if (error) {
+                showAlert('Gagal Memuat Data', error.message, false);
+                return;
+            }
+            registrantsList = data || [];
+            updateRegistrantsTable();
+        }
+
+        async function reloadRegistrants() {
+            await loadRegistrants();
+        }
+
+        function updateRegistrantsTable() {
+            const tbody = document.getElementById('registrants-table-body');
+            const countEl = document.getElementById('total-registrants-count');
+            if (!tbody) return;
+
+            const searchVal = (document.getElementById('admin-search-input')?.value || '').toLowerCase();
+            const progFilter = document.getElementById('admin-filter-program')?.value || '';
+
+            const filtered = registrantsList.filter(r => {
+                const matchSearch = (r.name || '').toLowerCase().includes(searchVal) || (r.registration_number || '').toLowerCase().includes(searchVal);
+                const matchProg = progFilter === '' || r.program === progFilter;
+                return matchSearch && matchProg;
+            });
+
+            if (countEl) countEl.innerText = registrantsList.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400">Belum ada data pendaftar.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 font-bold text-primary text-xs">${esc(r.registration_number)}</td>
+                    <td class="p-4 font-semibold">${esc(r.name)}<br><span class="text-[10px] text-slate-400">NIK: ${esc(r.nik)}</span></td>
+                    <td class="p-4 text-xs font-medium text-secondary">${esc(r.program || 'Umum')}</td>
+                    <td class="p-4 text-xs">${esc(r.school)}</td>
+                    <td class="p-4 text-xs">${esc(r.parent)}<br><a href="${esc(waLink(r.phone))}" target="_blank" rel="noopener" class="text-emerald-600 hover:underline"><i class="fa-brands fa-whatsapp"></i> ${esc(r.phone)}</a></td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${r.status === 'Diterima' ? 'bg-emerald-100 text-emerald-800' : r.status === 'Ditolak' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}">${esc(r.status)}</span>
+                    </td>
+                    <td class="p-4 text-center whitespace-nowrap space-x-1">
+                        <button onclick="updateStatus('${esc(r.id)}', 'Diterima')" title="Terima" class="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg text-xs"><i class="fa-solid fa-check"></i></button>
+                        <button onclick="updateStatus('${esc(r.id)}', 'Ditolak')" title="Tolak" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs"><i class="fa-solid fa-xmark"></i></button>
+                        <button onclick="showRegistrationProofById('${esc(r.id)}')" title="Cetak Bukti" class="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs"><i class="fa-solid fa-print"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateStatus(id, newStatus) {
+            const { data, error } = await supabaseClient.from('registrants').update({ status: newStatus }).eq('id', id).select();
+            if (error) {
+                showAlert('Status Belum Berubah', 'Server menolak perubahan: ' + error.message, false);
+                return;
+            }
+            if (!data || data.length === 0) {
+                showAlert('Status Belum Berubah', 'Tidak ada data yang berubah. Pastikan Anda masih login sebagai admin dan policy UPDATE sudah dibuat.', false);
+                return;
+            }
+            const idx = registrantsList.findIndex(r => r.id === id);
+            if (idx !== -1) registrantsList[idx].status = newStatus;
+            updateRegistrantsTable();
+            showAlert('Berhasil', 'Status pendaftar diperbarui menjadi ' + newStatus);
+        }
+
+        function showRegistrationProofById(id) {
+            const found = registrantsList.find(r => r.id === id);
+            if (found) showRegistrationProof(found);
+        }
+
+        /* ---------- Admin: CRUD Program ---------- */
+        function renderAdminPrograms() {
+            const grid = document.getElementById('admin-programs-grid');
+            if (!grid) return;
+            const warn = programsFromDb ? '' : `
+                <div class="md:col-span-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-2xl p-4">
+                    Program yang tampil masih data bawaan, belum ada di database. Jalankan SQL "seed program" di Supabase agar program bisa diedit di sini.
+                </div>`;
+            grid.innerHTML = warn + currentPrograms.map(p => `
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 bg-primary/10 text-primary rounded-lg">Urutan: ${esc(p.sort_order)}</span>
+                            <span class="text-xs font-bold ${p.is_active ? 'text-emerald-600' : 'text-slate-400'}">${p.is_active ? 'Aktif' : 'Nonaktif'}</span>
+                        </div>
+                        <h4 class="font-bold text-primary text-base mb-2">${esc(p.name)}</h4>
+                        <p class="text-xs text-slate-600 line-clamp-3 mb-4">${esc(p.short_description)}</p>
+                    </div>
+                    <div class="flex space-x-2 pt-2 border-t border-slate-100">
+                        <button onclick="openProgramModal('${esc(p.id)}')" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-semibold transition">Edit</button>
+                        <button onclick="deleteProgram('${esc(p.id)}')" class="w-1/2 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-xl text-xs font-semibold transition">Hapus</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openProgramModal(id) {
+            document.getElementById('program-modal').classList.remove('hidden');
+            document.getElementById('program-form').reset();
+            document.getElementById('prog-id').value = '';
+            document.getElementById('program-modal-title').innerText = 'Tambah Program Baru';
+            if (id) {
+                const p = currentPrograms.find(item => String(item.id) === String(id));
+                if (p) {
+                    document.getElementById('program-modal-title').innerText = 'Edit Program';
+                    document.getElementById('prog-id').value = p.id;
+                    document.getElementById('prog-name').value = p.name || '';
+                    document.getElementById('prog-slug').value = p.slug || '';
+                    document.getElementById('prog-short').value = p.short_description || '';
+                    document.getElementById('prog-full').value = p.full_description || '';
+                    document.getElementById('prog-curriculum').value = p.curriculum_description || '';
+                    document.getElementById('prog-method').value = p.learning_method || '';
+                    document.getElementById('prog-requirements').value = p.requirements || '';
+                    document.getElementById('prog-schedule').value = p.schedule_description || '';
+                    document.getElementById('prog-order').value = p.sort_order || 1;
+                    document.getElementById('prog-active').value = p.is_active === false ? 'false' : 'true';
+                }
+            }
+        }
+        function closeProgramModal() { document.getElementById('program-modal').classList.add('hidden'); }
+
+        async function saveProgramData(e) {
+            e.preventDefault();
+            if (!programsFromDb) {
+                showAlert('Belum Bisa Disimpan', 'Program masih data bawaan. Jalankan SQL seed program di Supabase terlebih dahulu, lalu muat ulang halaman.', false);
+                return;
+            }
+            const id = document.getElementById('prog-id').value;
+            const payload = {
+                name: document.getElementById('prog-name').value.trim(),
+                slug: document.getElementById('prog-slug').value.trim(),
+                short_description: document.getElementById('prog-short').value.trim(),
+                full_description: document.getElementById('prog-full').value.trim(),
+                curriculum_description: document.getElementById('prog-curriculum').value.trim(),
+                learning_method: document.getElementById('prog-method').value.trim(),
+                requirements: document.getElementById('prog-requirements').value.trim(),
+                schedule_description: document.getElementById('prog-schedule').value.trim(),
+                sort_order: parseInt(document.getElementById('prog-order').value) || 1,
+                is_active: document.getElementById('prog-active').value === 'true'
+            };
+
+            let result;
+            if (id) {
+                result = await supabaseClient.from('programs').update(payload).eq('id', id).select();
+            } else {
+                result = await supabaseClient.from('programs').insert([payload]).select();
+            }
+            if (result.error) {
+                showAlert('Gagal Menyimpan', result.error.message, false);
+                return;
+            }
+            if (!result.data || result.data.length === 0) {
+                showAlert('Gagal Menyimpan', 'Tidak ada data yang berubah. Pastikan Anda login sebagai admin dan policy program sudah dibuat.', false);
+                return;
+            }
+
+            closeProgramModal();
+            await refreshProgramViews();
+            showAlert('Berhasil', 'Data program berhasil disimpan.');
+        }
+
+        async function deleteProgram(id) {
+            if (!programsFromDb) {
+                showAlert('Belum Bisa Dihapus', 'Program masih data bawaan, belum ada di database.', false);
+                return;
+            }
+            if (!confirm('Apakah Anda yakin ingin menghapus program ini?')) return;
+            const { data, error } = await supabaseClient.from('programs').delete().eq('id', id).select();
+            if (error || !data || data.length === 0) {
+                showAlert('Gagal Menghapus', error ? error.message : 'Tidak ada data yang terhapus. Pastikan Anda login sebagai admin.', false);
+                return;
+            }
+            await refreshProgramViews();
+            showAlert('Berhasil', 'Program berhasil dihapus.');
+        }
+
+        async function refreshProgramViews() {
+            await loadPrograms();
+            renderAdminPrograms();
+            renderHomePrograms();
+            renderSistemPendidikan();
+            populateProgramDropdown();
+        }
+    </script>
+</body>
+</html>
